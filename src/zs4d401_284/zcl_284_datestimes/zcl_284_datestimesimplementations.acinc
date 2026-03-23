@@ -1,0 +1,78 @@
+CLASS lcl_284_datestimes DEFINITION.
+
+  PUBLIC SECTION.
+    TYPES:
+      BEGIN OF st_res,
+        begin_date   TYPE /dmo/travel-begin_date,
+        end_date     TYPE /dmo/travel-end_date,
+        valid        TYPE abap_bool,
+        add_7_days   TYPE dats,
+        add_3_months TYPE dats,
+        duration     TYPE i,
+        weekday      TYPE i,
+        month        TYPE i,
+        day_name     TYPE string,
+      END OF st_res,
+
+      tbl_res TYPE TABLE OF st_res WITH EMPTY KEY,
+
+      BEGIN OF st_res2,
+        lastchangedat       TYPE /dmo/travel-lastchangedat,
+        lastchangedat_short TYPE timestamp, "timestamp short, timestampl long
+        date_est            TYPE dats,
+        time_est            TYPE string,
+      END OF st_res2,
+
+      tbl_res2 TYPE TABLE OF st_res2 WITH EMPTY KEY.
+
+    METHODS:
+      get_out
+        RETURNING VALUE(r_tbl) TYPE tbl_res,
+
+      get_out_timestamp
+        RETURNING VALUE(r_tbl) TYPE tbl_res2.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+
+ENDCLASS.
+
+CLASS lcl_284_datestimes IMPLEMENTATION.
+
+  METHOD get_out.
+
+    SELECT FROM /dmo/travel
+    FIELDS begin_date,
+        end_date,
+
+        is_valid( begin_date ) AS valid,
+        add_days( begin_date, 7 ) AS add_7_days,
+        add_months( begin_date, 3 ) AS add_3_months,
+        days_between( begin_date, end_date ) AS duration,
+        weekday( begin_date ) AS weekday,
+        extract_month( begin_date ) AS month,
+        dayname( begin_date ) AS day_name
+
+    WHERE days_between( begin_date, end_date ) > 10
+    INTO TABLE @DATA(result).
+
+    r_tbl = CORRESPONDING #( result ).
+
+  ENDMETHOD.
+
+  METHOD get_out_timestamp.
+
+    SELECT FROM /dmo/travel
+    FIELDS lastchangedat,
+
+        CAST( lastchangedat AS DEC( 15, 0 ) ) AS lastchangedat_short,
+        tstmp_to_dats( tstmp = CAST( lastchangedat AS DEC( 15, 0 ) ), tzone = CAST( 'EST' AS CHAR( 6 ) ) ) AS date_est,
+        tstmp_to_tims( tstmp = CAST( lastchangedat AS DEC( 15, 0 ) ), tzone = CAST( 'EST' AS CHAR( 6 ) ) ) AS time_est
+
+    WHERE customer_id = '000050'
+    INTO TABLE @DATA(result).
+
+    r_tbl = CORRESPONDING #( result ).
+
+  ENDMETHOD.
+
+ENDCLASS.

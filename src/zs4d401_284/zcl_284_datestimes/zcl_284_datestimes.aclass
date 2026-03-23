@@ -1,0 +1,70 @@
+CLASS zcl_284_datestimes DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+
+    INTERFACES if_oo_adt_classrun .
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+
+
+CLASS zcl_284_datestimes IMPLEMENTATION.
+
+  METHOD if_oo_adt_classrun~main.
+
+    DATA(lcl) = NEW lcl_284_datestimes(  ).
+
+    "date processing
+    out->write( EXPORTING data = lcl->get_out(  ) name = 'RESULT DATE PROCESSING' ).
+
+    "conversion functions
+    out->write( EXPORTING data = lcl->get_out_timestamp(  ) name = 'RESULT CONVERSION FUNCTIONS' ).
+
+    "more conversion functions
+*    DATA(today) = cl_abap_context_info=>get_system_date(  ).
+*
+*    SELECT FROM /dmo/travel
+*         FIELDS total_price,
+*                currency_code,
+*
+*                currency_conversion( amount             = total_price,
+*                                     source_currency    = currency_code,
+*                                     target_currency    = 'EUR',
+*                                     exchange_rate_date = @today
+*                                   ) AS total_price_EUR
+*
+*          WHERE customer_id = '000001' AND currency_code <> 'EUR'
+*           INTO TABLE @DATA(result_currency).
+*
+*    out->write(
+*      EXPORTING
+*        data   = result_currency
+*        name   = 'RESULT__CURRENCY'
+*    ).
+
+
+**********************************************************************
+
+    SELECT FROM /dmo/connection
+         FIELDS distance,
+                distance_unit,
+                unit_conversion( quantity = CAST( distance AS QUAN ),
+                                 source_unit = distance_unit,
+                                 target_unit = CAST( 'MI' AS UNIT ) )  AS distance_MI
+
+          WHERE airport_from_id = 'FRA'
+           INTO TABLE @DATA(result_unit).
+
+    out->write(
+      EXPORTING
+        data   = result_unit
+        name   = 'RESULT_UNIT'
+    ).
+
+  ENDMETHOD.
+
+ENDCLASS.
