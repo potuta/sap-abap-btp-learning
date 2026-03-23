@@ -1,0 +1,32 @@
+CLASS zcl_284_sqljoins DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+    INTERFACES if_oo_adt_classrun.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+
+
+CLASS zcl_284_sqljoins IMPLEMENTATION.
+  METHOD if_oo_adt_classrun~main.
+
+    DATA(lcl) = NEW lcl_284_sqljoins(  ).
+
+    "inner join
+    out->write( EXPORTING data = lcl->get_out_innerjoin(  ) name = 'RESULT INNER JOIN' ).
+
+    "left outer join
+    out->write( EXPORTING data = lcl->get_out_leftouterjoin(  ) name = 'RESULT LEFT OUTER JOIN' ).
+
+    "right outer join
+    out->write( exporting data = lcl->get_out_rightouterjoin(  ) name = 'RESULT RIGHT OUTER JOIN' ).
+
+    "nested joins
+    out->write( exporting data = lcl->get_out_nestedjoins(  ) name = 'RESULT NESTED JOINS' ).
+
+  ENDMETHOD.
+ENDCLASS.

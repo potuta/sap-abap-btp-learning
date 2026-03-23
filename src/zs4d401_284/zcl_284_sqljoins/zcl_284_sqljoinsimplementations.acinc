@@ -1,0 +1,130 @@
+CLASS lcl_284_sqljoins DEFINITION.
+
+  PUBLIC SECTION.
+
+    TYPES:
+      BEGIN OF st_result,
+        carrier_id      TYPE /dmo/carrier-carrier_id,
+        carrier_name    TYPE /dmo/carrier-name,
+        connection_id   TYPE /dmo/connection-connection_id,
+        airport_from_id TYPE /dmo/connection-airport_from_id,
+        airport_to_id   TYPE /dmo/connection-airport_to_id,
+        departure_time  TYPE /dmo/connection-departure_time,
+        arrival_time    TYPE /dmo/connection-arrival_time,
+        dest_airport_name    TYPE /dmo/airport-name,
+        dest_city            TYPE /dmo/airport-city,
+        dest_country         TYPE /dmo/airport-country,
+      END OF st_result,
+      ty_result_tab TYPE STANDARD TABLE OF st_result WITH EMPTY KEY.
+
+    METHODS:
+      get_out_innerjoin
+        RETURNING VALUE(r_tbl) TYPE ty_result_tab,
+
+      get_out_leftouterjoin
+        RETURNING VALUE(r_tbl) TYPE ty_result_tab,
+
+      get_out_rightouterjoin
+        RETURNING VALUE(r_tbl) TYPE ty_result_tab,
+
+      get_out_nestedjoins
+        RETURNING VALUE(r_tbl) TYPE ty_result_tab.
+
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+
+ENDCLASS.
+
+CLASS lcl_284_sqljoins IMPLEMENTATION.
+
+  METHOD get_out_innerjoin.
+
+    SELECT FROM /dmo/carrier
+    INNER JOIN /dmo/connection
+    ON /dmo/carrier~carrier_id = /dmo/connection~carrier_id
+
+    FIELDS /dmo/carrier~carrier_id,
+        name AS carrier_name,
+        connection_id,
+        airport_from_id,
+        airport_to_id
+
+    WHERE currency_code = 'EUR'
+    INTO TABLE @DATA(tbl1).
+
+    r_tbl = tbl1.
+
+  ENDMETHOD.
+
+  METHOD get_out_leftouterjoin.
+
+    SELECT FROM /dmo/carrier
+     LEFT OUTER JOIN /dmo/connection
+     ON /dmo/carrier~carrier_id = /dmo/connection~carrier_id
+
+     FIELDS /dmo/carrier~carrier_id,
+         name AS carrier_name,
+         connection_id,
+         airport_from_id,
+         airport_to_id
+
+     WHERE currency_code = 'EUR'
+     INTO TABLE @DATA(tbl1).
+
+    r_tbl = tbl1.
+
+  ENDMETHOD.
+
+  METHOD get_out_rightouterjoin.
+
+    SELECT FROM /dmo/carrier
+       RIGHT OUTER JOIN /dmo/connection
+       ON /dmo/carrier~carrier_id = /dmo/connection~carrier_id
+
+       FIELDS /dmo/carrier~carrier_id,
+           name AS carrier_name,
+           connection_id,
+           airport_from_id,
+           airport_to_id
+
+       WHERE currency_code = 'EUR'
+       INTO TABLE @DATA(tbl1).
+
+    r_tbl = tbl1.
+
+  ENDMETHOD.
+
+  METHOD get_out_nestedjoins.
+
+    SELECT FROM /dmo/carrier AS a
+
+        LEFT OUTER JOIN
+
+        /dmo/connection AS c
+        LEFT OUTER JOIN /dmo/airport AS apf
+        ON c~airport_from_id = apf~airport_id
+
+        LEFT OUTER JOIN /dmo/airport AS apt
+        ON c~airport_to_id = apt~airport_id
+
+        ON a~carrier_id = c~carrier_id
+
+        FIELDS a~carrier_id,
+        a~name AS carrier_name,
+        connection_id,
+        airport_from_id,
+        airport_to_id,
+        departure_time,
+        arrival_time,
+        apt~name,
+        apt~city,
+        apt~country
+
+        WHERE currency_code = 'EUR'
+        INTO TABLE @DATA(tbl).
+
+    r_tbl = tbl.
+
+  ENDMETHOD.
+
+ENDCLASS.
