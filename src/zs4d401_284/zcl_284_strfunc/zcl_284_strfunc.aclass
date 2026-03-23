@@ -1,0 +1,47 @@
+CLASS zcl_284_strfunc DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+    INTERFACES if_oo_adt_classrun.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+
+
+CLASS zcl_284_strfunc IMPLEMENTATION.
+  METHOD if_oo_adt_classrun~main.
+
+    DATA text TYPE string.
+    DATA result_int TYPE i.
+
+    text = 'Hello World env'.
+
+    result_int = numofchar( text ).
+    out->write( result_int ).
+
+    result_int = find( val = text sub = 'env' ).
+    out->write( result_int ).
+
+    DATA result_string TYPE string.
+
+    result_string = replace( val = text sub = 'env' with = 'Env' ).
+    out->write( result_string ).
+
+    IF contains( val = text sub = 'env' ).
+      out->write( 'true' ).
+    ELSE.
+      out->write( 'false' ).
+    ENDIF.
+
+    " Description Functions
+    DATA(lcl) = new lcl_284_strfunc(  ).
+    out->write( lcl->get_out_descfunc(  ) ).
+
+    " Processing Functions
+    out->write( lcl->get_out_processingfunc(  ) ).
+
+  ENDMETHOD.
+ENDCLASS.

@@ -1,0 +1,79 @@
+CLASS lcl_284_strfunc DEFINITION.
+
+  PUBLIC SECTION.
+    METHODS:
+      get_out_descfunc
+        RETURNING VALUE(r_output) TYPE string_table,
+
+      get_out_processingfunc
+        RETURNING VALUE(r_output) TYPE string_table.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+
+ENDCLASS.
+
+CLASS lcl_284_strfunc IMPLEMENTATION.
+
+  METHOD get_out_descfunc.
+
+    DATA result TYPE i.
+    DATA text TYPE string VALUE 'ABAP'.
+    DATA substring TYPE string VALUE 'AB'.
+    DATA offset TYPE i VALUE 1.
+
+*    result = strlen(     text ).
+*    result = numofchar(  text ).
+
+    result = count(             val = text sub = substring off = offset ).
+*    result = find(             val = text sub = substring off = offset ).
+
+*    result = count_any_of(     val = text sub = substring off = offset ).
+*    result = find_any_of(      val = text sub = substring off = offset ).
+
+*    result = count_any_not_of( val = text sub = substring off = offset ).
+*    result = find_any_not_of(  val = text sub = substring off = offset ).
+
+    APPEND |Text      = `{ text }`| &&
+            |Substring = `{ substring }` | &&
+            |Offset    = { offset } | &&
+            |Result    = { result } |
+    TO r_output.
+
+  ENDMETHOD.
+
+  METHOD get_out_processingfunc.
+
+    DATA text TYPE string VALUE 'SAP BTP, ABAP Environment'.
+
+    "Change Case of characters
+    APPEND |TO_UPPER = { to_upper( text ) } | &&
+            |TO_LOWER = { to_lower( text ) } | &&
+            |TO_MIXED         = {   to_mixed(  text ) } | &&
+            |FROM_MIXED       = { from_mixed(  text ) } |
+    TO r_output.
+
+    " Change order of characters
+    APPEND |REVERSE             = {  reverse( text ) } | &&
+            |SHIFT_LEFT  (places)= {  shift_left(  val = text places   = 3  ) } | &&
+            |SHIFT_RIGHT (places)= {  shift_right( val = text places   = 3  ) } | &&
+            |SHIFT_LEFT  (circ)  = {  shift_left(  val = text circular = 3  ) } | &&
+            |SHIFT_RIGHT (circ)  = {  shift_right( val = text circular = 3  ) } |
+    TO r_output.
+
+    " Extract a Substring
+    APPEND |SUBSTRING       = {  substring(        val = text off = 4 len = 10 ) } | &&
+           |SUBSTRING_FROM  = {  substring_from(   val = text sub = 'ABAP'     ) } | &&
+           |SUBSTRING_AFTER = {  substring_after(  val = text sub = 'ABAP'     ) } | &&
+           |SUBSTRING_TO    = {  substring_to(     val = text sub = 'ABAP'     ) } | &&
+           |SUBSTRING_BEFORE= {  substring_before( val = text sub = 'ABAP'     ) } |
+   TO r_output.
+    " Condense, REPEAT and Segment
+   APPEND |CONDENSE         = {   condense( val = text ) } | &&
+           |REPEAT           = {   repeat(   val = text occ = 2 ) } | &&
+           |SEGMENT1         = {   segment(  val = text sep = ',' index = 1 ) } | &&
+           |SEGMENT2         = {   segment(  val = text sep = ',' index = 2 ) } |
+   TO r_output.
+
+  ENDMETHOD.
+
+ENDCLASS.
