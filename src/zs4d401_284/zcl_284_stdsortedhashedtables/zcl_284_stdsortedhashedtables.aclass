@@ -24,7 +24,7 @@ CLASS zcl_284_stdsortedhashedtables IMPLEMENTATION.
 
 "Notes: standard tables are O(n) execution time, sorted tables are O(log n) because of binary search, hashed table are O(1) constants because of key-value pairs.
 "Modifying standard tables use APPEND statement, sorted and hashed table use INSERT statements instead since sorted tables are sorted in ascending order always and hashed tables will lead to syntax errors.
-"Reading/Accessing sorted and hashed tables without its key fields will lead to sequential search rather than optimized searches such as binary search and hash algorithms. 
+"Reading/Accessing sorted and hashed tables without its key fields will lead to sequential search rather than optimized searches such as binary search and hash algorithms.
 "Which is why it is important to add WITH NON-UNIQUE KEY OR WITH UNIQUE KEY to sorted tables, Hashed tables are always WITH UNIQUE KEY, or add a Secondary key.
 
     out->write( |Done| ).
