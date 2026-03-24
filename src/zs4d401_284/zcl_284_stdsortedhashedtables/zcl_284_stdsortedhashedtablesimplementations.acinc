@@ -1,0 +1,67 @@
+class lcl_284_stdsortedhashedtables definition.
+
+  public section.
+    methods:
+        constructor,
+        access_standard,
+        access_sorted,
+        access_hashed.
+  protected section.
+  private section.
+    data:
+        standard_table type standard table of /dmo/flight with non-unique key carrier_id connection_id flight_date,
+        sorted_table type sorted table of /dmo/flight with non-unique key carrier_id connection_id flight_date,
+        hashed_table type hashed table of /dmo/flight with unique key carrier_id connection_id flight_date,
+
+        key_carrier_id type /dmo/carrier_id,
+        key_connection_id type /dmo/connection_id,
+        key_date type /dmo/flight_date.
+
+    methods:
+        set_line_to_read.
+
+endclass.
+
+class lcl_284_stdsortedhashedtables implementation.
+
+  method constructor.
+
+    select from /dmo/flight
+    fields *
+    into table @standard_table.
+
+    select from /dmo/flight
+    fields *
+    into table @sorted_table.
+
+    select from /dmo/flight
+    fields *
+    into table @hashed_table.
+
+    set_line_to_read(  ).
+
+  endmethod.
+
+  method access_hashed.
+    data(res) = hashed_table[ carrier_id = me->key_carrier_id connection_id = me->key_connection_id flight_date = me->key_date ].
+  endmethod.
+
+  method access_sorted.
+    data(res) = sorted_table[ carrier_id = me->key_carrier_id connection_id = me->key_connection_id flight_date = me->key_date ].
+  endmethod.
+
+  method access_standard.
+    data(res) = standard_table[ carrier_id = me->key_carrier_id connection_id = me->key_connection_id flight_date = me->key_date ].
+  endmethod.
+
+  method set_line_to_read.
+
+    data(line) = standard_table[ conv i( lines( standard_table ) * '0.65' ) ].
+
+    me->key_carrier_id = line-carrier_id.
+    me->key_connection_id = line-connection_id.
+    me->key_date = line-flight_date.
+
+  endmethod.
+
+endclass.
