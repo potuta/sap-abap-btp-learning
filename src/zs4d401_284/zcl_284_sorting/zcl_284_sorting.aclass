@@ -1,0 +1,44 @@
+CLASS zcl_284_sorting DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+
+    INTERFACES if_oo_adt_classrun .
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+
+
+CLASS zcl_284_sorting IMPLEMENTATION.
+  METHOD if_oo_adt_classrun~main.
+
+    data(lcl) = new lcl_284_sorting(  ).
+
+    "sorting
+    out->write( exporting data = lcl->get_out_sorting(  ) name = 'RESULT SORTING' ).
+
+    "sorting distinct
+    out->write( exporting data = lcl->get_out_sortingdistinct(  ) name = 'RESULT SORTING DISTINCT' ).
+
+    "aggregate functions ver 1
+    data:
+        lt_tbl1 type lcl->tbl_res3,
+        lt_tbl2 type lcl->tbl_res4.
+
+    lcl->get_out_aggregatefunc( importing e_tbl1 = lt_tbl1 e_tbl2 = lt_tbl2 ).
+
+    out->write( exporting data = lt_tbl1 name = 'RESULT AGGREGATE FUNCTION ver 1 1' ).
+    out->write( exporting data = lt_tbl2 name = 'RESULT AGGREGATE FUNCTION ver 1 2' ).
+
+    "aggregate functions ver 2
+    out->write( exporting data = lcl->get_out_aggregatefunc2(  )-tbl1 name = 'RESULT AGGREGATE FUNCTION VER 2 1' ).
+    out->write( exporting data = lcl->get_out_aggregatefunc2(  )-tbl2 name = 'RESULT AGGREGATE FUNCTION VER 2 2' ).
+
+    "group by
+    out->write( exporting data = lcl->get_out_groupby(  ) name = 'RESULT GROUP BY' ).
+
+  ENDMETHOD.
+ENDCLASS.

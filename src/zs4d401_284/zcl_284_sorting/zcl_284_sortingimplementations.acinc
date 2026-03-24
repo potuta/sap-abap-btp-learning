@@ -1,0 +1,173 @@
+class lcl_284_sorting definition.
+
+  public section.
+    types:
+        begin of st_res,
+        carrier_id type /dmo/flight-carrier_id,
+        connection_id type /dmo/flight-connection_id,
+        flight_date type /dmo/flight-flight_date,
+        seats type i,
+        end of st_res,
+
+    tbl_res type table of st_res with empty key,
+
+        begin of st_res2,
+        airport_from_id type /dmo/connection-airport_from_id,
+        distance_unit type /dmo/connection-distance_unit,
+        end of st_res2,
+
+    tbl_res2 type table of st_res2 with empty key,
+
+        begin of st_res3,
+        carrier_id type /dmo/connection-carrier_id,
+        connection_id type /dmo/connection-connection_id,
+        airport_from_id type /dmo/connection-airport_from_id,
+        distance type /dmo/connection-distance,
+        end of st_res3,
+
+    tbl_res3 type table of st_res3 with empty key,
+
+        begin of st_res4,
+        max type i,
+        min type i,
+        sum type i,
+        average type decfloat16,
+        count type i,
+        count_dist type i,
+        end of st_res4,
+
+    tbl_res4 type table of st_res4 with empty key,
+
+    "put list of tables into structure
+        begin of st_res_list,
+        tbl1 type tbl_res3,
+        tbl2 type tbl_res4,
+        end of st_res_list.
+
+    methods:
+        get_out_sorting
+            returning value(r_tbl) type tbl_res,
+
+       get_out_sortingdistinct
+            returning value(r_tbl) type tbl_res2,
+
+       "version 1 using exporting
+       get_out_aggregatefunc
+            exporting:
+                e_tbl1 type tbl_res3
+                e_tbl2 type tbl_res4,
+
+        "version 2 returning using structured list of tables
+        get_out_aggregatefunc2
+            returning value(r_tbls) type st_res_list,
+
+        get_out_groupby
+            returning value(r_tbl) type tbl_res4.
+  protected section.
+  private section.
+
+endclass.
+
+class lcl_284_sorting implementation.
+
+  method get_out_sorting.
+
+    select from /dmo/flight
+    fields carrier_id,
+        connection_id,
+        flight_date,
+        seats_max - seats_occupied as seats
+    where carrier_id = 'AA' and plane_type_id = 'A320-200'
+    order by seats_max - seats_occupied descending, flight_date ascending
+    into table @data(res).
+
+    r_tbl = corresponding #( res ).
+
+  endmethod.
+
+  method get_out_sortingdistinct.
+
+    select from /dmo/connection
+    fields distinct
+        airport_from_id,
+        distance_unit
+    order by airport_from_id
+    into table @data(res).
+
+    r_tbl = corresponding #( res ).
+
+  endmethod.
+
+  method get_out_aggregatefunc.
+
+    select from /dmo/connection
+    fields carrier_id,
+        connection_id,
+        airport_from_id,
+        distance
+    where carrier_id = 'LH'
+    into table @data(res1).
+
+    e_tbl1 = corresponding #( res1 ).
+
+    select from /dmo/connection
+    fields
+        max( distance ) as max,
+        min( distance ) as min,
+        sum( distance ) as sum,
+        avg( distance ) as average,
+        count( * ) as count,
+        count( distinct airport_from_id ) as count_dist
+
+    where carrier_id = 'LH'
+    into table @data(res2).
+
+    e_tbl2 = corresponding #( res2 ).
+
+  endmethod.
+
+  method get_out_aggregatefunc2.
+
+   select from /dmo/connection
+    fields carrier_id,
+        connection_id,
+        airport_from_id,
+        distance
+    where carrier_id = 'LH'
+    into table @data(res1).
+
+    r_tbls-tbl1 = corresponding #( res1 ).
+
+    select from /dmo/connection
+    fields
+        max( distance ) as max,
+        min( distance ) as min,
+        sum( distance ) as sum,
+        avg( distance ) as average,
+        count( * ) as count,
+        count( distinct airport_from_id ) as count_dist
+
+    where carrier_id = 'LH'
+    into table @data(res2).
+
+    r_tbls-tbl2 = corresponding #( res2 ).
+
+  endmethod.
+
+  method get_out_groupby.
+
+    select from /dmo/connection
+    fields
+        carrier_id,
+        max( distance ) as max,
+        min( distance ) as min,
+        sum( distance ) as sum,
+        count( * ) as count
+    group by carrier_id
+    into table @data(res).
+
+    r_tbl = corresponding #( res ).
+
+  endmethod.
+
+endclass.
