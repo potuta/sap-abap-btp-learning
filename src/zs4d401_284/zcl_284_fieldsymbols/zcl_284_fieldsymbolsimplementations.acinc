@@ -1,0 +1,61 @@
+class lcl_284_fieldsymbols definition.
+
+  public section.
+    methods:
+        use_work_area,
+        use_field_symbol.
+  protected section.
+  private section.
+    types:
+        t_flights type standard table of /dmo/flight with non-unique key carrier_id connection_id flight_date.
+
+    methods:
+        loop_field_symbol changing c_flights type t_flights,
+        loop_work_area changing c_flights type t_flights.
+
+endclass.
+
+class lcl_284_fieldsymbols implementation.
+
+  method use_field_symbol.
+
+    data flights type t_flights.
+
+    select from /dmo/flight
+    fields *
+    into table @flights.
+
+    loop_field_symbol( changing c_flights = flights ).
+
+  endmethod.
+
+  method use_work_area.
+
+    data flights type t_flights.
+
+    select from /dmo/flight
+    fields *
+    into table @flights.
+
+    loop_work_area( changing c_flights = flights ).
+
+  endmethod.
+
+  method loop_field_symbol.
+
+    loop at c_flights assigning FIELD-SYMBOL(<c>).
+        <c>-seats_occupied += 1.
+    endloop.
+
+  endmethod.
+
+  method loop_work_area.
+
+    LOOP AT c_flights INTO DATA(flight).
+        flight-seats_occupied += 1.
+        MODIFY c_flights FROM flight.
+    ENDLOOP.
+
+  endmethod.
+
+endclass.
