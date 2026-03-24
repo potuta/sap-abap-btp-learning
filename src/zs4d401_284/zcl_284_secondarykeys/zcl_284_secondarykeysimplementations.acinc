@@ -1,0 +1,72 @@
+class lcl_284_secondarykeys definition.
+
+  public section.
+    methods:
+        constructor,
+        read_primary,
+        read_non_key,
+        read_secondary_1,
+        read_secondary_2,
+        read_secondary_3.
+  protected section.
+  private section.
+    data:
+        connections type sorted table of /dmo/flight with non-unique key carrier_id connection_id flight_date,
+        connections_sk type sorted table of /dmo/flight with non-unique key carrier_id connection_id flight_date
+        with non-unique sorted key k_plane components plane_type_id.
+
+endclass.
+
+class lcl_284_secondarykeys implementation.
+
+  method constructor.
+
+    select from /dmo/flight
+    fields *
+    into table @connections.
+
+    select from /dmo/flight
+    fields *
+    into table @connections_sk.
+
+  endmethod.
+
+  method read_non_key.
+
+    loop at connections into data(conn) where plane_type_id = '737-800'.
+    endloop.
+
+  endmethod.
+
+  method read_primary.
+
+    data count type i value 1.
+
+    loop at connections into data(conn) where carrier_id = 'LH' and connection_id = '0405'.
+        count += 1.
+    endloop.
+
+  endmethod.
+
+  method read_secondary_1.
+
+    loop at connections_sk into data(conn) using key k_plane where plane_type_id = '737-800'.
+    endloop.
+
+  endmethod.
+
+  method read_secondary_2.
+
+    loop at connections_sk into data(conn) using key k_plane where plane_type_id = '737-800'.
+    endloop.
+
+  endmethod.
+
+  method read_secondary_3.
+
+    loop at connections_sk into data(conn) using key k_plane where plane_type_id = '737-800'.
+    endloop.
+
+  endmethod.
+
+endclass.
