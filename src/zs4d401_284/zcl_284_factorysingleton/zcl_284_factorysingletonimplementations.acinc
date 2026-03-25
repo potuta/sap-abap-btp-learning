@@ -1,0 +1,75 @@
+class lcl_284_factorysingleton definition create private.
+
+  public section.
+    methods:
+        constructor
+            importing
+                i_carrier_id type /dmo/carrier_id
+                i_connection_id type /dmo/connection_id
+                i_airport_from_id type /dmo/airport_from_id
+                i_airport_to_id type /dmo/airport_to_id.
+
+    class-methods get_class
+        importing
+            i_carrier_id type /dmo/carrier_id
+            i_connection_id type /dmo/connection_id
+
+        returning value(r_class) type ref to lcl_284_factorysingleton.
+  protected section.
+  private section.
+    types:
+        begin of st_instance,
+        carrier_id type /dmo/carrier_id,
+        connection_id type /dmo/connection_id,
+        object type ref to lcl_284_factorysingleton,
+        end of st_instance,
+
+        tbl_instances type hashed table of st_instance with unique key carrier_id connection_id.
+
+    data:
+        carrier_id type /dmo/carrier_id,
+        connection_id type /dmo/connection_id,
+        airport_from_id type /dmo/airport_from_id,
+        airport_to_id type /dmo/airport_to_id.
+
+   class-data instances type tbl_instances.
+
+endclass.
+
+class lcl_284_factorysingleton implementation.
+
+  method constructor.
+
+    me->carrier_id = i_carrier_id.
+    me->connection_id = i_connection_id.
+    me->airport_from_id = i_airport_from_id.
+    me->airport_to_id = i_airport_to_id.
+
+  endmethod.
+
+  method get_class.
+
+    data fromAirport type /dmo/airport_from_id.
+    data toAirport type /dmo/airport_to_id.
+
+    if not line_exists( instances[ carrier_id = i_carrier_id connection_id = i_connection_id ] ).
+
+        select single from /dmo/connection
+        fields
+            airport_from_id,
+            airport_to_id
+        where carrier_id = @i_carrier_id and connection_id = @i_connection_id
+        into ( @fromAirport, @toAirport ).
+
+        r_class = new lcl_284_factorysingleton( i_carrier_id = i_carrier_id i_connection_id = i_connection_id i_airport_from_id = fromAirport i_airport_to_id = toAirport ).
+
+        data(new_instance) = value st_instance( carrier_id = i_carrier_id connection_id = i_connection_id object = r_class ).
+        insert new_instance into table instances.
+
+    else.
+        r_class = instances[ carrier_id = i_carrier_id connection_id = i_connection_id ]-object.
+    endif.
+
+  endmethod.
+
+endclass.
