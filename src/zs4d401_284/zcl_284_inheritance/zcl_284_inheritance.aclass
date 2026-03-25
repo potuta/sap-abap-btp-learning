@@ -1,0 +1,38 @@
+CLASS zcl_284_inheritance DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+    interfaces if_oo_adt_classrun.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+
+
+CLASS zcl_284_inheritance IMPLEMENTATION.
+
+  METHOD if_oo_adt_classrun~main.
+
+    data(lcl_plane) = new lcl_plane( i_manufacturer = 'PH' i_type = 'PLANE' ).
+    data(lcl_passenger_plane) = new lcl_passenger_plane( i_manufacturer = 'PH' i_type = 'PASSENGER' i_seats = 25 ).
+    data(lcl_cargo_plane) = new lcl_cargo_plane( i_manufacturer = 'PH' i_type = 'CARGO' i_cargo = 40 ).
+
+    data(lcl_helper) = new lcl_helper(  ).
+    out->write( '----------' ).
+    out->write( 'lcl_plane' ).
+    out->write( '----------' ).
+    out->write( lcl_helper->get_attributes( i_tt_attributes = lcl_plane->get_attributes(  ) ) ).
+    out->write( '----------' ).
+    out->write( 'lcl_passenger_plane' ).
+    out->write( '----------' ).
+    out->write( lcl_helper->get_attributes( i_tt_attributes = lcl_passenger_plane->get_attributes(  ) ) ).
+    out->write( '----------' ).
+    out->write( 'lcl_cargo_plane' ).
+    out->write( '----------' ).
+    out->write( lcl_helper->get_attributes( i_tt_attributes = lcl_cargo_plane->get_attributes(  ) ) ).
+
+  ENDMETHOD.
+
+ENDCLASS.

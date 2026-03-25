@@ -1,0 +1,146 @@
+class lcl_plane definition.
+
+  public section.
+    types:
+        begin of st_attributes,
+        name type string,
+        value type string,
+        end of st_attributes,
+
+        tt_attributes type sorted table of st_attributes with unique key name.
+
+    methods:
+        constructor
+            importing
+                i_manufacturer type string
+                i_type type string,
+
+        get_attributes
+            returning value(r_attributes) type tt_attributes.
+  protected section.
+    data:
+        manufacturer type string,
+        type type string.
+  private section.
+
+endclass.
+
+class lcl_plane implementation.
+
+  method constructor.
+    me->manufacturer = i_manufacturer.
+    me->type = i_type.
+  endmethod.
+
+  method get_attributes.
+
+    r_attributes = VALUE #(
+        ( name = 'MANUFACTURER' value = manufacturer )
+        ( name = 'TYPE' value = type )
+    ).
+
+  endmethod.
+
+endclass.
+
+class lcl_cargo_plane definition inheriting from lcl_plane.
+
+  public section.
+    methods:
+        constructor
+            importing
+                i_manufacturer type string
+                i_type type string
+                i_cargo type i,
+        get_attributes
+            redefinition.
+  protected section.
+  private section.
+    data cargo type i.
+
+endclass.
+
+class lcl_cargo_plane implementation.
+
+  method constructor.
+
+    super->constructor( i_manufacturer = i_manufacturer i_type = i_type ).
+    me->cargo = i_cargo.
+
+  endmethod.
+
+  method get_attributes.
+
+    r_attributes = value tt_attributes( "can use # for implicit declaration
+        ( name = 'MANUFACTURER' value = manufacturer )
+        ( name = 'TYPE' value = type )
+        ( name = 'CARGO' value = cargo )
+    ).
+
+  endmethod.
+
+endclass.
+
+class lcl_passenger_plane definition inheriting from lcl_plane.
+
+  public section.
+    METHODS:
+        constructor
+            IMPORTING
+                i_manufacturer TYPE string
+                i_type TYPE string
+                i_seats type i,
+
+        get_attributes
+            redefinition.
+  protected section.
+  private section.
+    data seats type i.
+
+endclass.
+
+class lcl_passenger_plane implementation.
+
+  method constructor.
+
+    super->constructor( i_manufacturer = i_manufacturer i_type = i_type ).
+    me->seats = i_seats.
+
+  endmethod.
+
+  method get_attributes.
+    r_attributes = super->get_attributes(  ).
+    r_attributes = value #(
+       base r_attributes ( name = 'SEATS' value = seats )
+    ).
+  endmethod.
+
+endclass.
+
+class lcl_helper definition.
+
+  public section.
+    methods:
+        get_attributes
+            importing
+                i_tt_attributes type lcl_plane=>tt_attributes
+
+            returning value(r_output) type string_table.
+  protected section.
+  private section.
+
+endclass.
+
+class lcl_helper implementation.
+
+  method get_attributes.
+
+    loop at i_tt_attributes into data(a).
+
+       append |name = { a-name } value = { a-value }| to r_output.
+
+    endloop.
+
+  endmethod.
+
+endclass.
